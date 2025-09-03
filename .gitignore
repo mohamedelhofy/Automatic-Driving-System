@@ -1,0 +1,21 @@
+# Ignore build artifacts
+*.o
+*.d
+*.elf
+*.hex
+*.map
+*.lss
+
+# Ignore generated subdir.mk files
+*.mk
+
+# Ignore build/debug folders
+Debug/
+Release/
+Ultrasonic/Debug/
+Ultrasonic/Release/
+
+# Ignore backup files
+*~
+*.swp
+*.bak
