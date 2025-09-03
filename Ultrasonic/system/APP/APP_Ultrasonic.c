@@ -1,85 +1,35 @@
-/*
- * APP_LCD.c
- *
- *  Created on: Aug 26, 2025
- *      Author: alhof
- */
-#include "../Library/STD_TYPES.h"
 #include "../Library/BIT_MATH.h"
-#include "../HAL/Keypad_Interface.h"
-#include "../HAL/Keypad_Config.h"
+#include "../Library/STD_TYPES.h"
 #include "../MCAL/DIO_Interface.h"
-#include "../MCAL/EXT_IN_Interface.h"
-#include "../HAL/LCD_Interfac.h"
-#include "../HAL/LCD_Config.h"
+#include "../MCAL/GIE_Interface.h"
+#include "../MCAL/Timer1_Interface.h"
+#include <avr/interrupt.h>
 #include "util/delay.h"
-#include <avr/interrupt.h>
-#include "../MCAL/ADC_Interface.h"
-#include <stdio.h>
-
-#define F_CPU 8000000UL
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <string.h>
-#include <stdlib.h>
-
-#define  Trigger_pin	PA0	/* Trigger pin */
-
-
-int TimerOverflow = 0;
+#include <avr/iom32.h>
 
 ISR(TIMER1_OVF_vect)
 {
-	TimerOverflow++;	/* Increment Timer Overflow count */
+	 static u16 Counter=0;
+	 if (Counter >= 15)
+	 {
+
+		 DIO_voidSetPinValue(DIO_u8_PORTB,DIO_u8_PIN1,DIO_u8_HIGH);
+		 Counter=0;
+
+	 }
+	 Counter++;
+
 }
 
-int main(void)
+
+int main()
 {
-	char string[10];
-	long count;
-	double distance;
-
-	DDRA = 0x01;		/* Make trigger pin as output */
-	DDRD =0x00;
-	PORTD = 0xFF;		/* Turn on Pull-up */
-
-	LCD_Init();
-	LCD_String_xy(0, 0, "Ultrasonic");
-
-	sei();			/* Enable global interrupt */
-	TIMSK = (1 << TOIE1);	/* Enable Timer1 overflow interrupts */
-	TCCR1A = 0;		/* Set all bit to zero Normal operation */
+	Timer1_voidInit_Normal();
+	DIO_voidSetPinDirection(DIO_u8_PORTB,DIO_u8_PIN1,DIO_u8_OUTPUT);
 
 	while(1)
 	{
-		/* Give 10us trigger pulse on trig. pin to HC-SR04 */
-		PORTA |= (1 << Trigger_pin);
-		_delay_us(10);
-		PORTA &= (~(1 << Trigger_pin));
 
-		TCNT1 = 0;	/* Clear Timer counter */
-		TCCR1B = 0x41;	/* Capture on rising edge, No prescaler*/
-		TIFR = 1<<ICF1;	/* Clear ICP flag (Input Capture flag) */
-		TIFR = 1<<TOV1;	/* Clear Timer Overflow flag */
-
-		/*Calculate width of Echo by Input Capture (ICP) */
-
-		while ((TIFR & (1 << ICF1)) == 0);/* Wait for rising edge */
-		TCNT1 = 0;	/* Clear Timer counter */
-		TCCR1B = 0x01;	/* Capture on falling edge, No prescaler */
-		TIFR = 1<<ICF1;	/* Clear ICP flag (Input Capture flag) */
-		TIFR = 1<<TOV1;	/* Clear Timer Overflow flag */
-		TimerOverflow = 0;/* Clear Timer overflow count */
-
-		while ((TIFR & (1 << ICF1)) == 0);/* Wait for falling edge */
-		count = ICR1 + (65535 * TimerOverflow);	/* Take count */
-		/* 8MHz Timer freq, sound speed =343 m/s */
-		distance = (double)count / 466.47;
-
-		dtostrf(distance, 2, 2, string);/* distance to string */
-		strcat(string, " cm   ");	/* Concat unit i.e.cm */
-		LCD_String_xy(1, 0, "Dist = ");
-		LCD_String_xy(1, 7, string);	/* Print distance */
-		_delay_ms(200);
 	}
+	return 0;
 }
