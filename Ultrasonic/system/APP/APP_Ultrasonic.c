@@ -1,35 +1,45 @@
-#include "../Library/BIT_MATH.h"
 #include "../Library/STD_TYPES.h"
+#include "../Library/BIT_MATH.h"
+#include "../HAL/Ultrasonic_Interface.h"
+#include "../HAL/LCD_Interfac.h"
 #include "../MCAL/DIO_Interface.h"
-#include "../MCAL/GIE_Interface.h"
-#include "../MCAL/Timer1_Interface.h"
-#include <avr/interrupt.h>
-#include "util/delay.h"
-#include <avr/iom32.h>
+#include <util/delay.h>
+#include <stdlib.h>
 
-ISR(TIMER1_OVF_vect)
+int main(void)
 {
-	 static u16 Counter=0;
-	 if (Counter >= 15)
-	 {
+    f32 distance;
 
-		 DIO_voidSetPinValue(DIO_u8_PORTB,DIO_u8_PIN1,DIO_u8_HIGH);
-		 Counter=0;
+    /* Init */
+    Ultrasonic_Init();
 
-	 }
-	 Counter++;
-
-}
+    /* LEDs on PORTC */
+    DIO_voidSetPortDirection(DIO_u8_PORTA, 0xFF);
 
 
-int main()
-{
-	Timer1_voidInit_Normal();
-	DIO_voidSetPinDirection(DIO_u8_PORTB,DIO_u8_PIN1,DIO_u8_OUTPUT);
+    while(1)
+    {
+        distance = Ultrasonic_GetDistance();
 
-	while(1)
-	{
 
-	}
-	return 0;
+        /* Handle LED output */
+        if (distance < 10)
+            DIO_voidSetPortValue(DIO_u8_PORTA, 0b00000001); // LED0 ON
+        else if (distance < 20)
+            DIO_voidSetPortValue(DIO_u8_PORTA, 0b00000010); // LED1 ON
+        else if (distance < 30)
+            DIO_voidSetPortValue(DIO_u8_PORTA, 0b00000100); // LED2 ON
+        else if (distance < 40)
+            DIO_voidSetPortValue(DIO_u8_PORTA, 0b00001000); // LED3 ON
+        else if (distance < 70)
+            DIO_voidSetPortValue(DIO_u8_PORTA, 0b00010000); // LED3 ON
+        else if (distance < 100)
+            DIO_voidSetPortValue(DIO_u8_PORTA, 0b00100000); // LED3 ON
+        else if (distance < 120)
+            DIO_voidSetPortValue(DIO_u8_PORTB, 0b01000000); // LED3 ON
+        else
+            DIO_voidSetPortValue(DIO_u8_PORTA, 0b10000000); // Last LED ON
+
+        _delay_ms(200);
+    }
 }
