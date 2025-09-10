@@ -8,34 +8,33 @@
 #include "MCAL/DIO_Interface.h"
 #include "MCAL/Timer1_Interface.h"
 #include "MCAL/Timer0_Interface.h"
+#include "MCAL/EXT_IN_Interface.h"
 #include "HAL/ULTRASONIC_Interface.h"
 #include "HAL/Servo_Interface.h"
 #include "HAL/L298_Interface.h"
 
 #include <util/delay.h>
+#include <avr/interrupt.h>
+volatile u8 mode = 1; // 1 = Auto mode, 0 = Manual mode
 
+ISR(INT1_vect)
+{
+    mode ^= 1;   // Toggle between Auto and Manual
+}
 int main(void)
 {
     u16 distance, leftDist, rightDist;
-    u8 mode = 1; // 1 = Auto mode, 0 = Manual mode
 
     // Initialization
     L298_voidInit();
     SERVO_voidInit();
     Ultrasonic_Init();
+    EXT1_IN_Enable();  // Enable interrupt on PD3
 
-    // Mode toggle button on PD0
-    DIO_voidSetPinDirection(DIO_u8_PORTD, DIO_u8_PIN0, DIO_u8_INPUT);
-    DIO_voidSetPinValue(DIO_u8_PORTD, DIO_u8_PIN0, DIO_u8_HIGH); // Enable internal pull-up
 
     while(1)
     {
-        // Check button for toggling mode
-        if(DIO_u8GetPinValue(DIO_u8_PORTD, DIO_u8_PIN0) == 0)
-        {
-            _delay_ms(200);  // Debounce delay
-            mode ^= 1;       // Toggle between Auto and Manual
-        }
+
 
         if(mode == 1) // ---- AUTO MODE ----
         {
