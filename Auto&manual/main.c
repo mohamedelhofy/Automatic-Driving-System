@@ -69,24 +69,24 @@ void Auto_Mode(void)
 }
 
 // --------- ISR for UART RX ---------
-//ISR(USART_RXC_vect)
-//{
-//	PORTA ^= (1 << PA7);
-//    unsigned char read = UDR;
-//
-//    switch (read)
-//    {
-//        case 'A': mode = 1; break;  // Auto Mode
-//        case 'M': mode = 0; break;  // Manual Mode
-//
-//        // Manual control commands
-//        case 'F': if (mode == 0) L298_voidMove(MOVE_FORWARD);  break;
-//        case 'B': if (mode == 0) L298_voidMove(MOVE_BACKWARD); break;
-//        case 'R': if (mode == 0) L298_voidMove(MOVE_RIGHT);    break;
-//        case 'L': if (mode == 0) L298_voidMove(MOVE_LEFT);     break;
-//        case 'S': if (mode == 0) L298_voidMove(MOVE_STOP);     break;
-//    }
-//}
+ISR(USART_RXC_vect)
+{
+	PORTA ^= (1 << PA7);
+   unsigned char read = UDR;
+
+   switch (read)
+   {
+       case 'A': mode = 1; break;  // Auto Mode
+       case 'M': mode = 0; break;  // Manual Mode
+
+       // Manual control commands
+       case 'F': if (mode == 0) L298_voidMove(MOVE_FORWARD);  break;
+       case 'B': if (mode == 0) L298_voidMove(MOVE_BACKWARD); break;
+       case 'R': if (mode == 0) L298_voidMove(MOVE_RIGHT);    break;
+       case 'L': if (mode == 0) L298_voidMove(MOVE_LEFT);     break;
+       case 'S': if (mode == 0) L298_voidMove(MOVE_STOP);     break;
+   }
+}
 
 // --------- MAIN ---------
 int main(void)
@@ -95,10 +95,10 @@ int main(void)
     L298_voidInit();
     SERVO_voidInit();
     Ultrasonic_Init();
-   // UART_Init();
+    UART_Init();
 
     // Enable global interrupt
-  //  sei();
+    sei();
 
     while (1)
     {
@@ -109,3 +109,4 @@ int main(void)
         // Manual Mode مفيش Loop هنا، الأوامر بتتنفذ من الـ ISR مباشرة
     }
 }
+
