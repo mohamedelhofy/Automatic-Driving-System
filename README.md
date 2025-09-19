@@ -61,23 +61,27 @@ The project implements a small-scale RC car that can be controlled in two modes:
 ---
 
 ## 🔄 Project Flowchart
-![Flowchart](media/flowchart.jpg)
+<img src="media/flowchart.jpg"  width="500"/>
 
 ---
 ## 🖥️ Simulation (Proteus)  
 
 The project was first simulated in **Proteus** to validate hardware connections and driver implementation before testing on the real car.  
 
-![Proteus Simulation](./simulation.png) 
+<img src="./simulation.png"  width="500"/>
+
 ---
 
 ## 📷 Project Media  
 
+### Car Photo
+<img src="media/app.jpg"  width="200"/>
+
 ### 🔹 Manual  
-[![Manual Mode video](media/app.jpg)](media/manual.mp4)  
+[Manual Mode video](https://drive.google.com/file/d/1v2Ui6UzvkFgJ_0dGpkjtimTGSpLtA7AO/view?usp=drive_link)  
 
 ### 🔹 Autonomous   
-[![Autonomous Mode video](media/car.jpg)](media/auto.mp4)  
+[Autonomous Mode video](https://drive.google.com/file/d/1DU7kRMeUeHKziOvJE07AWk6hgkB6O8rl/view?usp=drive_link)  
 
 ---
 
